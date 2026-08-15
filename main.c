@@ -10,8 +10,8 @@ int main()
 {
     FILE *ptr1, *ptr2;
     struct studentData stdList[100];
-    ptr1 = fopen("input1.txt", "r");
-    ptr2 = fopen("output1.txt", "w");
+    ptr1 = fopen("student_input.txt", "r");
+    ptr2 = fopen("output.txt", "w");
     int n, i;
     fscanf(ptr1, "%d", &n);
 
