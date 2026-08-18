@@ -27,6 +27,7 @@ int main()
     struct studentData stdList[100];
 
     int n, i, count = 0;
+    int success = 1;
 
     inputFile = fopen("student_input.txt", "r");
 
@@ -46,31 +47,51 @@ int main()
         return 1;
     }
 
-    fscanf(inputFile, "%d", &n);
-
-    if (n > 100 || n < 1)
+    if (fscanf(inputFile, "%d", &n) != 1)
     {
-        printf("Invalid number of students.\n");
-        fclose(inputFile);
-        fclose(outputFile);
-        return 1;
+        printf("Error: Invalid input file format.\n");
+        success = 0;
     }
 
-    fprintf(outputFile, "------------------------------------------------------\n");
-    fprintf(outputFile, "ID      Name      CSE103   MAT101   ENG7101   CGPA\n");
-    fprintf(outputFile, "------------------------------------------------------\n");
-
-    for (i = 0; i < n; i++)
+    if (success && (n < 1 || n > 100))
     {
-        fscanf(inputFile, "%d", &stdList[i].s_ID);
+        printf("Error: Number of students must be between 1 and 100.\n");
+        success = 0;
+    }
+
+    if (success)
+    {
+        fprintf(outputFile, "------------------------------------------------------\n");
+        fprintf(outputFile, "ID      Name      CSE103   MAT101   ENG7101   CGPA\n");
+        fprintf(outputFile, "------------------------------------------------------\n");
+    }
+
+    for (i = 0; i < n && success; i++)
+    {
+        if (fscanf(inputFile, "%d", &stdList[i].s_ID) != 1)
+        {
+            printf("Error: Invalid student ID for student %d.\n", i + 1);
+            success = 0;
+            break;
+        }
 
         fgetc(inputFile);
 
-        fscanf(inputFile, "%[^\n]", stdList[i].name);
+        if (fscanf(inputFile, "%[^\n]", stdList[i].name) != 1)
+        {
+            printf("Error: Invalid student name for student %d.\n", i + 1);
+            success = 0;
+            break;
+        }
 
-        fscanf(inputFile, "%f", &stdList[i].gpa_CSE103);
-        fscanf(inputFile, "%f", &stdList[i].gpa_MAT101);
-        fscanf(inputFile, "%f", &stdList[i].gpa_ENG7101);
+        if (fscanf(inputFile, "%f", &stdList[i].gpa_CSE103) != 1 ||
+            fscanf(inputFile, "%f", &stdList[i].gpa_MAT101) != 1 ||
+            fscanf(inputFile, "%f", &stdList[i].gpa_ENG7101) != 1)
+        {
+            printf("Error: Invalid GPA data for student %d.\n", i + 1);
+            success = 0;
+            break;
+        }
 
         if (stdList[i].gpa_CSE103 < 0.0 ||
             stdList[i].gpa_CSE103 > 4.0 ||
@@ -79,13 +100,13 @@ int main()
             stdList[i].gpa_ENG7101 < 0.0 ||
             stdList[i].gpa_ENG7101 > 4.0)
         {
-            printf("Invalid data found!\n");
+            printf("Error: Invalid GPA found for student %d (%s).\n",
+                   stdList[i].s_ID, stdList[i].name);
+
             printf("GPA of each course must be between 0.00 and 4.00.\n");
 
-            fclose(inputFile);
-            fclose(outputFile);
-
-            return 1;
+            success = 0;
+            break;
         }
 
         stdList[i].t_CGPA = calculateCGPA(
@@ -106,20 +127,31 @@ int main()
         count++;
     }
 
-    if (count == 0)
-    {
-        printf("No student records found.\n");
-
-        fclose(inputFile);
-        fclose(outputFile);
-
-        return 0;
-    }
-
     fclose(inputFile);
     fclose(outputFile);
 
-    printf("\nGrade sheet successfully saved to output.txt\n");
+    if (!success)
+    {
+        remove("output.txt");
+
+        printf("\nGrade sheet was NOT generated successfully.\n");
+        printf("Please fix the error in student_input.txt and try again.\n");
+
+        return 1;
+    }
+
+    if (count == 0)
+    {
+        remove("output.txt");
+
+        printf("No student records found.\n");
+        printf("Grade sheet was NOT generated successfully.\n");
+
+        return 1;
+    }
+
+    printf("\nAll student records processed successfully.\n");
+    printf("Grade sheet successfully saved to output.txt\n");
 
     return 0;
 }
