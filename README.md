@@ -128,9 +128,13 @@ The program creates `output.txt` and writes one formatted record for each studen
 Example:
 
 ```text
-Serial: 1 Student ID: 101, Name: Alice, GPA in CSE103, MAT101, ENG7101: 3.80, 3.50, 3.90, Calculated CGPA: 3.72
-Serial: 2 Student ID: 102, Name: Bob, GPA in CSE103, MAT101, ENG7101: 3.60, 3.00, 3.70, Calculated CGPA: 3.46
-Serial: 3 Student ID: 103, Name: Charlie, GPA in CSE103, MAT101, ENG7101: 4.00, 3.80, 3.90, Calculated CGPA: 3.89
+------------------------------------------------------
+ID      Name      CSE103   MAT101   ENG7101   CGPA
+------------------------------------------------------
+1001    Alice      3.80     3.50     3.70     3.69    
+1002    Bob        2.90     3.20     2.80     2.96    
+1003    Charlie    3.50     3.90     3.60     3.64    
+1004    Diana      3.20     2.70     3.10     3.03 
 ```
 
 ## 🔧 How the Program Works
