@@ -15,58 +15,111 @@ float calculateCGPA(float cse103, float mat101, float eng101)
     float cseCredit = 4.5;
     float matCredit = 3.0;
     float engCredit = 3.0;
-    return ((cse103 * cseCredit) + (mat101 * matCredit) + (eng101 * engCredit)) / 10.5;
+
+    return ((cse103 * cseCredit) +
+            (mat101 * matCredit) +
+            (eng101 * engCredit)) / 10.5;
 }
 
 int main()
 {
     FILE *inputFile, *outputFile;
     struct studentData stdList[100];
+
+    int n, i, count = 0;
+
     inputFile = fopen("student_input.txt", "r");
+
     if (inputFile == NULL)
     {
         printf("Error: Could not open student_input.txt\n");
         printf("Please make sure the input file exists.\n");
         return 1;
     }
+
     outputFile = fopen("output.txt", "w");
+
     if (outputFile == NULL)
     {
         printf("Error: Could not create output.txt\n");
-        return 0;
+        fclose(inputFile);
+        return 1;
     }
-    fprintf(outputFile, "------------------------------------------------------\n");
-    fprintf(outputFile,"ID      Name      CSE103   MAT101   ENG101    CGPA\n");
-    fprintf(outputFile,"-------------------------------------------------------\n");
-    int n, i, count = 0;
+
     fscanf(inputFile, "%d", &n);
+
+    if (n > 100 || n < 1)
+    {
+        printf("Invalid number of students.\n");
+        fclose(inputFile);
+        fclose(outputFile);
+        return 1;
+    }
+
+    fprintf(outputFile, "------------------------------------------------------\n");
+    fprintf(outputFile, "ID      Name      CSE103   MAT101   ENG7101   CGPA\n");
+    fprintf(outputFile, "------------------------------------------------------\n");
 
     for (i = 0; i < n; i++)
     {
-        count++;
         fscanf(inputFile, "%d", &stdList[i].s_ID);
+
         fgetc(inputFile);
-        fscanf(inputFile, "%[^\n]s", stdList[i].name);
+
+        fscanf(inputFile, "%[^\n]", stdList[i].name);
+
         fscanf(inputFile, "%f", &stdList[i].gpa_CSE103);
         fscanf(inputFile, "%f", &stdList[i].gpa_MAT101);
         fscanf(inputFile, "%f", &stdList[i].gpa_ENG7101);
-        if (stdList[i].gpa_CSE103 > 4.00 || stdList[i].gpa_MAT101 > 4.00 || stdList[i].gpa_ENG7101 > 4.00)
+
+        if (stdList[i].gpa_CSE103 < 0.0 ||
+            stdList[i].gpa_CSE103 > 4.0 ||
+            stdList[i].gpa_MAT101 < 0.0 ||
+            stdList[i].gpa_MAT101 > 4.0 ||
+            stdList[i].gpa_ENG7101 < 0.0 ||
+            stdList[i].gpa_ENG7101 > 4.0)
         {
-            printf("Invalid data found! GPA of each courses should be equal or less than 4.00");
-            return 0;
+            printf("Invalid data found!\n");
+            printf("GPA of each course must be between 0.00 and 4.00.\n");
+
+            fclose(inputFile);
+            fclose(outputFile);
+
+            return 1;
         }
 
-        stdList[i].t_CGPA = calculateCGPA(stdList[i].gpa_CSE103, stdList[i].gpa_MAT101, stdList[i].gpa_ENG7101);
-        fprintf(outputFile,"%-7d %-10s %-8.2f %-8.2f %-8.2f %-8.2f\n",
-        stdList[i].s_ID, stdList[i].name, stdList[i].gpa_CSE103, stdList[i].gpa_MAT101, stdList[i].gpa_ENG7101, stdList[i].t_CGPA);
+        stdList[i].t_CGPA = calculateCGPA(
+            stdList[i].gpa_CSE103,
+            stdList[i].gpa_MAT101,
+            stdList[i].gpa_ENG7101
+        );
+
+        fprintf(outputFile,
+                "%-7d %-10s %-8.2f %-8.2f %-8.2f %-8.2f\n",
+                stdList[i].s_ID,
+                stdList[i].name,
+                stdList[i].gpa_CSE103,
+                stdList[i].gpa_MAT101,
+                stdList[i].gpa_ENG7101,
+                stdList[i].t_CGPA);
+
+        count++;
     }
+
     if (count == 0)
     {
         printf("No student records found.\n");
+
+        fclose(inputFile);
+        fclose(outputFile);
+
         return 0;
     }
+
     fclose(inputFile);
-    printf("\nGrade sheet successfully saved to output.txt\n");
     fclose(outputFile);
+
+    printf("\nGrade sheet successfully saved to output.txt\n");
+
     return 0;
 }
