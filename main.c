@@ -77,7 +77,7 @@ int main()
 
         fgetc(inputFile);
 
-        if (fscanf(inputFile, "%[^\n]", stdList[i].name) != 1)
+        if (fscanf(inputFile, "%[^\n]s", stdList[i].name) != 1)
         {
             printf("Error: Invalid student name for student %d.\n", i + 1);
             success = 0;
